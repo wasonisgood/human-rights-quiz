@@ -9,7 +9,7 @@ import { getFirestore, collection, getDocs, query, where } from 'firebase/firest
 // Firebase配置
 const firebaseConfig = {
   apiKey: "AIzaSyBollsBjbUKsNtgKVEyyHYPxUxSZ5UuK34",
-  authDomain: "student-welfare-5c104.firebaseapp.com", 
+  authDomain: "student-welfare-5c104.firebaseapp.com",
   projectId: "student-welfare-5c104",
   storageBucket: "student-welfare-5c104.firebasestorage.app",
   messagingSenderId: "1062729448140",
@@ -125,7 +125,7 @@ export default function HumanRightsQuizApp() {
       try {
         const eventsCollection = collection(db, 'humanRightsEvents');
         const eventsSnapshot = await getDocs(eventsCollection);
-        
+
         const eventsByCategory = {
           "正義勇氣型": [],
           "理想主義型": [],
@@ -134,19 +134,19 @@ export default function HumanRightsQuizApp() {
           "社會參與型": [],
           "平等包容型": []
         };
-        
+
         const allEventsArray = [];
 
         eventsSnapshot.forEach((doc) => {
           const data = doc.data();
           const category = data.category;
-          
+
           // 將事件添加到總集合中
           allEventsArray.push({
             id: doc.id,
             ...data
           });
-          
+
           // 按分類分組事件
           if (category && eventsByCategory[category]) {
             eventsByCategory[category].push({
@@ -284,7 +284,7 @@ export default function HumanRightsQuizApp() {
             }
           ]
         };
-        
+
         // 為其他類型添加默認事件
         Object.keys(personalityTypes).forEach(key => {
           if (!defaultEvents[key]) {
@@ -299,7 +299,7 @@ export default function HumanRightsQuizApp() {
             }];
           }
         });
-        
+
         setFirebaseEvents(defaultEvents);
         setAllEvents(Object.values(defaultEvents).flat());
         setLoading(false);
@@ -314,12 +314,12 @@ export default function HumanRightsQuizApp() {
     // 找出得分最高的類型
     const maxScore = Math.max(...Object.values(scores));
     const resultType = Object.keys(scores).find(key => scores[key] === maxScore);
-    
+
     setResult(resultType);
-    
+
     // 檢查是否有該類型的事件
     let events = firebaseEvents[resultType] || [];
-    
+
     // 如果沒有該類型的事件，從所有事件中隨機選擇一個
     if (events.length === 0) {
       console.log(`沒有找到${resultType}類型的事件，使用隨機事件代替`);
@@ -338,19 +338,19 @@ export default function HumanRightsQuizApp() {
         }];
       }
     }
-    
+
     // 隨機選擇一個事件，並確保日期格式一致
     const randomEvent = events[Math.floor(Math.random() * events.length)];
-    
+
     // 如果是日期格式為YYYY-MM-DD，取出年份部分添加「年代」
     if (randomEvent.date && randomEvent.date.match(/^\d{4}(-|\/)/)) {
       randomEvent.formattedDate = randomEvent.date.substring(0, 4) + '年代';
     } else {
       randomEvent.formattedDate = randomEvent.date;
     }
-    
+
     setSelectedEvent(randomEvent);
-    
+
     // 轉換到結果頁面
     setStage('result');
   };
@@ -392,46 +392,43 @@ export default function HumanRightsQuizApp() {
   // 下載圖片
   const downloadImage = async () => {
     try {
-      const html2canvas = (await import('html2canvas')).default;
+      const domtoimage = (await import('dom-to-image')).default;
       if (!shareRef.current) {
         console.error('分享元素參考不存在');
         return;
       }
-      
-      // 在截圖前應用額外的樣式以確保渲染正確
+
+      // 使用 dom-to-image 生成圖片
       const element = shareRef.current;
-      
-      // 創建截圖
-      const canvas = await html2canvas(element, {
-        scale: 2, // 提高解析度
-        backgroundColor: '#ffffff',
-        logging: false,
-        useCORS: true,
-        allowTaint: false,
-        letterRendering: true, // 改善文字渲染
-        onclone: function(documentClone) {
-          // 獲取克隆文檔中的目標元素
-          const clonedElement = documentClone.querySelector('.screenshot-target');
-          if (clonedElement) {
-            // 在克隆元素上應用任何額外樣式修正
-            clonedElement.style.position = 'static';
-            clonedElement.style.display = 'block';
-            
-            // 修復內部元素
-            const textElements = clonedElement.querySelectorAll('.text-element');
-            textElements.forEach(element => {
-              element.style.position = 'relative';
-              element.style.display = 'block';
-              element.style.margin = '0 0 5px 0';
-            });
-          }
-        }
+
+      // 確保元素的樣式正確，避免偏移
+      const originalStyle = element.style.cssText;
+      element.style.margin = '0';
+      element.style.padding = '0';
+      element.style.transform = 'translate(0, 0)';
+
+      // 設定輸出圖片的寬度和高度
+      const width = element.offsetWidth * 2; // 2 倍寬度
+      const height = element.offsetHeight * 2; // 2 倍高度
+
+      const dataUrl = await domtoimage.toPng(element, {
+        width: width, // 設定圖片寬度
+        height: height, // 設定圖片高度
+        quality: 1, // 設置圖片質量
+        bgcolor: '#ffffff', // 背景顏色
+        style: {
+          transform: 'scale(2)', // 確保縮放比例正確
+          transformOrigin: 'top left', // 設置縮放原點
+        },
       });
-      
+
+      // 恢復原始樣式
+      element.style.cssText = originalStyle;
+
       const link = document.createElement('a');
       const formattedDate = selectedEvent?.formattedDate || '人權日';
       link.download = `my-human-rights-day-${formattedDate}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = dataUrl;
       link.click();
     } catch (error) {
       console.error('截圖失敗:', error);
@@ -442,51 +439,42 @@ export default function HumanRightsQuizApp() {
   // 分享功能
   const shareImage = async () => {
     try {
-      if (!navigator.canShare) {
-        // 如果不支援分享API，直接下載
-        downloadImage();
-        return;
-      }
-      
-      const html2canvas = (await import('html2canvas')).default;
+      const domtoimage = (await import('dom-to-image')).default;
       if (!shareRef.current) {
         console.error('分享元素參考不存在');
         return;
       }
-      
-      // 在截圖前應用額外的樣式以確保渲染正確
+
+      // 使用 dom-to-image 生成圖片
       const element = shareRef.current;
-      
-      // 創建截圖
-      const canvas = await html2canvas(element, {
-        scale: 2, // 提高解析度
-        backgroundColor: '#ffffff',
-        logging: false,
-        useCORS: true,
-        allowTaint: false,
-        letterRendering: true, // 改善文字渲染
-        onclone: function(documentClone) {
-          // 獲取克隆文檔中的目標元素
-          const clonedElement = documentClone.querySelector('.screenshot-target');
-          if (clonedElement) {
-            // 在克隆元素上應用任何額外樣式修正
-            clonedElement.style.position = 'static';
-            clonedElement.style.display = 'block';
-            
-            // 修復內部元素
-            const textElements = clonedElement.querySelectorAll('.text-element');
-            textElements.forEach(element => {
-              element.style.position = 'relative';
-              element.style.display = 'block';
-              element.style.margin = '0 0 5px 0';
-            });
-          }
-        }
+
+      // 確保元素的樣式正確，避免偏移
+      const originalStyle = element.style.cssText;
+      element.style.margin = '0';
+      element.style.padding = '0';
+      element.style.transform = 'translate(0, 0)';
+
+      // 設定輸出圖片的寬度和高度
+      const width = element.offsetWidth * 2; // 2 倍寬度
+      const height = element.offsetHeight * 2; // 2 倍高度
+
+      const dataUrl = await domtoimage.toPng(element, {
+        width: width, // 設定圖片寬度
+        height: height, // 設定圖片高度
+        quality: 1, // 設置圖片質量
+        bgcolor: '#ffffff', // 背景顏色
+        style: {
+          transform: 'scale(2)', // 確保縮放比例正確
+          transformOrigin: 'top left', // 設置縮放原點
+        },
       });
-      
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+      // 恢復原始樣式
+      element.style.cssText = originalStyle;
+
+      const blob = await fetch(dataUrl).then(res => res.blob());
       const file = new File([blob], 'human-rights-day.png', { type: 'image/png' });
-      
+
       if (navigator.share && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
@@ -494,18 +482,20 @@ export default function HumanRightsQuizApp() {
           text: `我是${result}！在社會運動中扮演著重要角色！一起來測測你在人權發展中的定位吧！`
         });
       } else {
-        downloadImage();
+        const link = document.createElement('a');
+        link.download = 'human-rights-day.png';
+        link.href = dataUrl;
+        link.click();
       }
     } catch (error) {
       console.error('分享失敗:', error);
-      // 如果分享失敗，退回到下載
-      downloadImage();
+      alert('分享失敗，請稍後再試。');
     }
   };
 
   // Intro畫面
   const IntroStage = () => (
-    <motion.div 
+    <motion.div
       className="min-h-screen bg-gradient-to-b from-blue-500 to-purple-600 flex flex-col items-center justify-center p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -518,13 +508,13 @@ export default function HumanRightsQuizApp() {
         className="text-center"
       >
         <h1 className="text-4xl font-bold text-white mb-4">台灣人權史上的一天</h1>
-        <p className="text-xl text-white/90 mb-4">探索你的人格特質<br/>找到專屬於你的歷史時刻</p>
-        
+        <p className="text-xl text-white/90 mb-4">探索你的人格特質<br />找到專屬於你的歷史時刻</p>
+
         <div className="mb-8">
           <p className="text-lg text-white/80 mb-2">清大學生會人權部</p>
           <p className="text-lg text-white/80">清音祭特別企劃</p>
         </div>
-        
+
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
@@ -540,7 +530,7 @@ export default function HumanRightsQuizApp() {
 
   // 測驗畫面
   const QuizStage = () => (
-    <motion.div 
+    <motion.div
       className="min-h-screen bg-gradient-to-b from-blue-500 to-purple-600 p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -550,7 +540,7 @@ export default function HumanRightsQuizApp() {
         {/* 進度條 */}
         <div className="mb-8">
           <div className="h-2 bg-white/30 rounded-full">
-            <motion.div 
+            <motion.div
               className="h-full bg-white rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
@@ -598,7 +588,7 @@ export default function HumanRightsQuizApp() {
 
   // 計算中畫面
   const CalculatingStage = () => (
-    <motion.div 
+    <motion.div
       className="min-h-screen bg-gradient-to-b from-blue-500 to-purple-600 flex items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -617,7 +607,7 @@ export default function HumanRightsQuizApp() {
 
   // 結果畫面
   const ResultStage = () => (
-    <motion.div 
+    <motion.div
       className="min-h-screen bg-gradient-to-b from-blue-500 to-purple-600 p-6 overflow-auto"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -693,7 +683,7 @@ export default function HumanRightsQuizApp() {
 
   // 分享畫面 - 重新設計的IG貼文
   const ShareStage = () => (
-    <motion.div 
+    <motion.div
       className="min-h-screen bg-gray-100 p-6 overflow-auto"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -701,8 +691,8 @@ export default function HumanRightsQuizApp() {
     >
       <div className="max-w-md mx-auto">
         {/* IG樣式卡片 - 固定寬度避免跑版 */}
-        <div 
-          ref={shareRef} 
+        <div
+          ref={shareRef}
           className="bg-white rounded-2xl shadow-xl overflow-hidden mb-6"
           style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}
         >
@@ -724,7 +714,7 @@ export default function HumanRightsQuizApp() {
                   </div>
                   <div className="text-blue-600">
                     <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                     </svg>
                   </div>
                 </div>
@@ -748,7 +738,7 @@ export default function HumanRightsQuizApp() {
                         ))}
                       </div>
                     </div>
-                    
+
                     {/* 簡短描述用戶可以做什麼 */}
                     <div className="mb-4">
                       <p className="text-sm text-gray-700 leading-relaxed max-w-xs mb-3">
