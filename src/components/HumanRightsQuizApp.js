@@ -101,6 +101,129 @@ const personalityTypes = {
   }
 };
 
+const DEFAULT_EVENTS = {
+  "正義勇氣型": [
+    {
+      id: 'default-justice-courage-1',
+      title: '二二八事件',
+      date: '1947-02-28',
+      description: '由於政府查緝私菸的不當行為引發民眾抗議，隨後演變成全島性的抗爭。政府派軍隊鎮壓，造成大量台灣菁英被逮捕、處決或失蹤的慘劇。展現了人民面對不公不義時挺身而出的勇氣。',
+      tags: ['歷史事件', '政府鎮壓', '民眾抗爭', '轉型正義'],
+      ig_caption: '1947年的二二八事件是台灣追求民主與人權的重要里程碑，提醒我們站出來對抗不公義的重要性 #二二八 #轉型正義 #人權歷史',
+      category: '正義勇氣型'
+    },
+    {
+      id: 'default-justice-courage-2',
+      title: '四六事件',
+      date: '1949-04-06',
+      description: '1949年，台灣的學生因抗議警方逮捕同學而展開運動，顯示了當時社會對於自由與正義的渴望。',
+      tags: ['學生運動', '抗議', '歷史', '台灣', '社會'],
+      ig_caption: '✊ 學生的聲音不可忽視！四六事件讓我們看到勇氣與團結的力量！📣 #學生運動 #追求自由',
+      category: '正義勇氣型'
+    }
+  ],
+  "理想主義型": [
+    {
+      id: 'default-idealism-1',
+      title: '台灣解嚴',
+      date: '1987-07-15',
+      description: '台灣結束長達38年的戒嚴時期，開啟了政治自由化與民主化的進程，是台灣民主發展的重要里程碑。',
+      tags: ['解嚴', '民主化', '自由化', '政治變革'],
+      ig_caption: '1987年的今天，台灣結束了長達38年的戒嚴時期，開啟了自由與民主的新時代。每一個理想主義者的堅持，都是推動社會前進的力量 #解嚴 #台灣民主化 #理想的力量',
+      category: '理想主義型'
+    },
+    {
+      id: 'default-idealism-2',
+      title: '雷震案',
+      date: '1960-09-04',
+      description: '雷震創辦的《自由中國》雜誌主張台灣必須推行民主改革，並計劃組織反對黨。國民黨當局以「為匪宣傳」罪名，逮捕雷震與其他參與人士，阻礙了台灣民主發展。',
+      tags: ['政治案件', '言論自由', '民主運動', '白色恐怖'],
+      ig_caption: '理想主義者雷震為台灣推動民主改革而犧牲，他的《自由中國》雜誌為台灣民主種下重要的種子 #理想主義 #民主先驅 #言論自由',
+      category: '理想主義型'
+    }
+  ],
+  "突破傳統型": [
+    {
+      id: 'default-breakthrough-1',
+      title: '鄭南榕自焚事件',
+      date: '1989-04-07',
+      description: '《自由時代》雜誌社社長鄭南榕為了捍衛「百分之百的言論自由」，在被控叛亂罪遭傳訊時，在雜誌社內自焚身亡，成為台灣爭取言論自由的象徵人物。',
+      tags: ['言論自由', '民主運動', '媒體自由', '政治抗爭'],
+      ig_caption: '「爭取百分之百的言論自由」，鄭南榕用生命捍衛信念，突破威權時代的禁忌，他的犧牲讓我們得以在自由的土地上發聲 #言論自由 #突破傳統 #鄭南榕',
+      category: '突破傳統型'
+    },
+    {
+      id: 'default-breakthrough-2',
+      title: '黨外雜誌創刊風潮',
+      date: '1979-08-16',
+      description: '1970年代末期，《美麗島》、《八十年代》等黨外雜誌相繼創刊，突破新聞管制，開啟台灣媒體自由化的先河。',
+      tags: ['媒體自由', '黨外運動', '突破傳統', '民主化'],
+      ig_caption: '突破傳統框架的先行者們，用文字打破言論封鎖，為台灣的自由開創了新的可能 #黨外雜誌 #美麗島 #突破傳統',
+      category: '突破傳統型'
+    }
+  ],
+  "民主改革型": [
+    {
+      id: 'default-democratic-reform-1',
+      title: '國會全面改選',
+      date: '1991-12-21',
+      description: '1991年國民大會代表全面改選，終結了「萬年國會」的歷史，是台灣民主憲政發展的重要里程碑。',
+      tags: ['民主改革', '選舉', '政治制度', '憲政發展'],
+      ig_caption: '結束「萬年國會」，台灣民主向前邁進一大步！每個投下神聖一票的公民，都是民主改革的推手 #國會改革 #民主制度 #憲政發展',
+      category: '民主改革型'
+    },
+    {
+      id: 'default-democratic-reform-2',
+      title: '司法院釋字第748號解釋',
+      date: '2017-05-24',
+      description: '大法官宣告現行民法未保障同性婚姻違憲，促成台灣成為亞洲第一個同性婚姻合法化的國家。',
+      tags: ['婚姻平權', '憲法解釋', '司法改革', '人權里程碑'],
+      ig_caption: '釋字第748號為台灣寫下歷史，讓平等深植於法律制度之中 #婚姻平權 #大法官解釋 #平等改革',
+      category: '民主改革型'
+    }
+  ],
+  "社會參與型": [
+    {
+      id: 'default-social-participation-1',
+      title: '美麗島事件',
+      date: '1979-12-10',
+      description: '1979年12月10日國際人權日，黨外人士在高雄舉行集會，後與警方發生衝突，政府隨後逮捕多位黨外領袖，是台灣民主運動的重要轉捩點。',
+      tags: ['民主運動', '社會參與', '政治抗爭', '國際人權日'],
+      ig_caption: '美麗島事件是台灣人民集體意識覺醒的時刻，透過公民的積極參與，我們一起推動社會走向民主與自由 #美麗島事件 #社會參與 #公民行動',
+      category: '社會參與型'
+    },
+    {
+      id: 'default-social-participation-2',
+      title: '野百合學運',
+      date: '1990-03-16',
+      description: '大學生在中正紀念堂靜坐抗議，要求解散國民大會、廢除臨時條款等政治改革，促使李登輝總統接受學生訴求，加速民主化進程。',
+      tags: ['學生運動', '社會參與', '民主改革', '公民行動'],
+      ig_caption: '從野百合學運開始，台灣的年輕人展現了積極參與公共事務的力量，證明每個人都能成為改變的起點 #野百合學運 #社會參與 #青年力量',
+      category: '社會參與型'
+    }
+  ],
+  "平等包容型": [
+    {
+      id: 'default-equality-inclusion-1',
+      title: '原住民正名運動',
+      date: '1984-12-29',
+      description: '台灣原住民族要求正名，擺脫「山胞」稱謂，爭取民族尊嚴與平等權利的社會運動，最終在1994年修憲時獲得正式肯認。',
+      tags: ['原住民族', '平等權利', '民族認同', '多元文化'],
+      ig_caption: '尊重多元、平等包容是民主社會的根基，原住民正名運動提醒我們每個群體的尊嚴與權利都應受到保障 #原住民正名 #民族平等 #多元包容',
+      category: '平等包容型'
+    },
+    {
+      id: 'default-equality-inclusion-2',
+      title: '婦女運動與性別平等法案',
+      date: '1987-04-10',
+      description: '解嚴後台灣婦女運動蓬勃發展，推動多項性別平等法案，如《家庭暴力防治法》、《性別平等教育法》等，促進社會更加平等與包容。',
+      tags: ['婦女運動', '性別平等', '法律改革', '社會正義'],
+      ig_caption: '平等與包容的社會，需要每個人的努力與支持，台灣婦女運動的成果讓我們向更公平的未來邁進 #性別平等 #包容社會 #平權法案',
+      category: '平等包容型'
+    }
+  ]
+};
+
 export default function HumanRightsQuizApp() {
   const [stage, setStage] = useState('intro'); // intro, quiz, calculating, result, share
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -114,17 +237,20 @@ export default function HumanRightsQuizApp() {
   });
   const [result, setResult] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [firebaseEvents, setFirebaseEvents] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [allEvents, setAllEvents] = useState([]); // 儲存所有事件用於備用
+  const [firebaseEvents, setFirebaseEvents] = useState(DEFAULT_EVENTS);
+  const [loading, setLoading] = useState(false);
+  const [allEvents, setAllEvents] = useState(Object.values(DEFAULT_EVENTS).flat());
   const shareRef = useRef(null);
 
-  // 從Firebase載入事件資料
+  // 背景嘗試從 Firebase 更新事件資料（若超時或失敗則保持預設資料）
   useEffect(() => {
+    let cancelled = false;
     const loadEvents = async () => {
       try {
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2500));
         const eventsCollection = collection(db, 'humanRightsEvents');
-        const eventsSnapshot = await getDocs(eventsCollection);
+        const snapshot = await Promise.race([getDocs(eventsCollection), timeoutPromise]);
+        if (cancelled || !snapshot || snapshot.empty) return;
 
         const eventsByCategory = {
           "正義勇氣型": [],
@@ -134,179 +260,24 @@ export default function HumanRightsQuizApp() {
           "社會參與型": [],
           "平等包容型": []
         };
-
-        const allEventsArray = [];
-
-        eventsSnapshot.forEach((doc) => {
+        const allList = [];
+        snapshot.forEach((doc) => {
           const data = doc.data();
-          const category = data.category;
-
-          // 將事件添加到總集合中
-          allEventsArray.push({
-            id: doc.id,
-            ...data
-          });
-
-          // 按分類分組事件
-          if (category && eventsByCategory[category]) {
-            eventsByCategory[category].push({
-              id: doc.id,
-              ...data
-            });
+          allList.push({ id: doc.id, ...data });
+          if (data.category && eventsByCategory[data.category]) {
+            eventsByCategory[data.category].push({ id: doc.id, ...data });
           }
         });
-
-        setAllEvents(allEventsArray);
-        setFirebaseEvents(eventsByCategory);
-        setLoading(false);
-      } catch (error) {
-        console.error("載入Firebase資料失敗:", error);
-        // 提供預設事件以防資料載入失敗
-        const defaultEvents = {
-          "正義勇氣型": [
-            {
-              id: 'default-justice-courage-1',
-              title: '二二八事件',
-              date: '1947-02-28',
-              description: '由於政府查緝私菸的不當行為引發民眾抗議，隨後演變成全島性的抗爭。政府派軍隊鎮壓，造成大量台灣菁英被逮捕、處決或失蹤的慘劇。展現了人民面對不公不義時挺身而出的勇氣。',
-              tags: ['歷史事件', '政府鎮壓', '民眾抗爭', '轉型正義'],
-              ig_caption: '1947年的二二八事件是台灣追求民主與人權的重要里程碑，提醒我們站出來對抗不公義的重要性 #二二八 #轉型正義 #人權歷史',
-              category: '正義勇氣型'
-            },
-            {
-              id: 'default-justice-courage-2',
-              title: '四六事件',
-              date: '1949-04-06',
-              description: '1949年，台灣的學生因抗議警方逮捕同學而展開運動，顯示了當時社會對於自由與正義的渴望。',
-              tags: ['學生運動', '抗議', '歷史', '台灣', '社會'],
-              ig_caption: '✊ 學生的聲音不可忽視！四六事件讓我們看到勇氣與團結的力量！📣 #學生運動 #追求自由',
-              category: '正義勇氣型'
-            }
-          ],
-          "理想主義型": [
-            {
-              id: 'default-idealism-1',
-              title: '台灣解嚴',
-              date: '1987-07-15',
-              description: '台灣結束長達38年的戒嚴時期，開啟了政治自由化與民主化的進程，是台灣民主發展的重要里程碑。',
-              tags: ['解嚴', '民主化', '自由化', '政治變革'],
-              ig_caption: '1987年的今天，台灣結束了長達38年的戒嚴時期，開啟了自由與民主的新時代。每一個理想主義者的堅持，都是推動社會前進的力量 #解嚴 #台灣民主化 #理想的力量',
-              category: '理想主義型'
-            },
-            {
-              id: 'default-idealism-2',
-              title: '雷震案',
-              date: '1960-09-04',
-              description: '雷震創辦的《自由中國》雜誌主張台灣必須推行民主改革，並計劃組織反對黨。國民黨當局以「為匪宣傳」罪名，逮捕雷震與其他參與人士，阻礙了台灣民主發展。',
-              tags: ['政治案件', '言論自由', '民主運動', '白色恐怖'],
-              ig_caption: '理想主義者雷震為台灣推動民主改革而犧牲，他的《自由中國》雜誌為台灣民主種下重要的種子 #理想主義 #民主先驅 #言論自由',
-              category: '理想主義型'
-            }
-          ],
-          "突破傳統型": [
-            {
-              id: 'default-breakthrough-1',
-              title: '鄭南榕自焚事件',
-              date: '1989-04-07',
-              description: '《自由時代》雜誌社社長鄭南榕為了捍衛「百分之百的言論自由」，在被控叛亂罪遭傳訊時，在雜誌社內自焚身亡，成為台灣爭取言論自由的象徵人物。',
-              tags: ['言論自由', '民主運動', '媒體自由', '政治抗爭'],
-              ig_caption: '「爭取百分之百的言論自由」，鄭南榕用生命捍衛信念，突破威權時代的禁忌，他的犧牲讓我們得以在自由的土地上發聲 #言論自由 #突破傳統 #鄭南榕',
-              category: '突破傳統型'
-            },
-            {
-              id: 'default-breakthrough-2',
-              title: '黨外雜誌創刊風潮',
-              date: '1979-08-16',
-              description: '1970年代末期，《美麗島》、《八十年代》等黨外雜誌相繼創刊，突破新聞管制，開啟台灣媒體自由化的先河。',
-              tags: ['媒體自由', '黨外運動', '突破傳統', '民主化'],
-              ig_caption: '突破傳統框架的先行者們，用文字打破言論封鎖，為台灣的自由開創了新的可能 #黨外雜誌 #美麗島 #突破傳統',
-              category: '突破傳統型'
-            }
-          ],
-          "民主改革型": [
-            {
-              id: 'default-democratic-reform-1',
-              title: '國會全面改選',
-              date: '1991-12-21',
-              description: '1991年國民大會代表全面改選，終結了「萬年國會」的歷史，是台灣民主憲政發展的重要里程碑。',
-              tags: ['民主改革', '選舉', '政治制度', '憲政發展'],
-              ig_caption: '結束「萬年國會」，台灣民主向前邁進一大步！每個投下神聖一票的公民，都是民主改革的推手 #國會改革 #民主制度 #憲政發展',
-              category: '民主改革型'
-            },
-            {
-              id: 'default-democratic-reform-2',
-              title: '國有特種房屋基地',
-              date: '1950-01-01',
-              description: '高雄市長楊金虎因妻子子涉貪而被捕，這起案件揭示了當時的政治腐敗，成為社會關注的焦點。',
-              tags: ['政治腐敗', '高雄市長', '社會問題', '楊金虎'],
-              ig_caption: '政治真正的力量來自人民的監督，貪腐必須被揭露和改革 #政治改革 #民主監督 #制度建設',
-              category: '民主改革型'
-            }
-          ],
-          "社會參與型": [
-            {
-              id: 'default-social-participation-1',
-              title: '美麗島事件',
-              date: '1979-12-10',
-              description: '1979年12月10日國際人權日，黨外人士在高雄舉行集會，後與警方發生衝突，政府隨後逮捕多位黨外領袖，是台灣民主運動的重要轉捩點。',
-              tags: ['民主運動', '社會參與', '政治抗爭', '國際人權日'],
-              ig_caption: '美麗島事件是台灣人民集體意識覺醒的時刻，透過公民的積極參與，我們一起推動社會走向民主與自由 #美麗島事件 #社會參與 #公民行動',
-              category: '社會參與型'
-            },
-            {
-              id: 'default-social-participation-2',
-              title: '野百合學運',
-              date: '1990-03-16',
-              description: '大學生在中正紀念堂靜坐抗議，要求解散國民大會、廢除臨時條款等政治改革，促使李登輝總統接受學生訴求，加速民主化進程。',
-              tags: ['學生運動', '社會參與', '民主改革', '公民行動'],
-              ig_caption: '從野百合學運開始，台灣的年輕人展現了積極參與公共事務的力量，證明每個人都能成為改變的起點 #野百合學運 #社會參與 #青年力量',
-              category: '社會參與型'
-            }
-          ],
-          "平等包容型": [
-            {
-              id: 'default-equality-inclusion-1',
-              title: '原住民正名運動',
-              date: '1984-12-29',
-              description: '台灣原住民族要求正名，擺脫「山胞」稱謂，爭取民族尊嚴與平等權利的社會運動，最終在1994年修憲時獲得正式肯認。',
-              tags: ['原住民族', '平等權利', '民族認同', '多元文化'],
-              ig_caption: '尊重多元、平等包容是民主社會的根基，原住民正名運動提醒我們每個群體的尊嚴與權利都應受到保障 #原住民正名 #民族平等 #多元包容',
-              category: '平等包容型'
-            },
-            {
-              id: 'default-equality-inclusion-2',
-              title: '婦女運動與性別平等法案',
-              date: '1987-04-10',
-              description: '解嚴後台灣婦女運動蓬勃發展，推動多項性別平等法案，如《家庭暴力防治法》、《性別平等教育法》等，促進社會更加平等與包容。',
-              tags: ['婦女運動', '性別平等', '法律改革', '社會正義'],
-              ig_caption: '平等與包容的社會，需要每個人的努力與支持，台灣婦女運動的成果讓我們向更公平的未來邁進 #性別平等 #包容社會 #平權法案',
-              category: '平等包容型'
-            }
-          ]
-        };
-
-        // 為其他類型添加默認事件
-        Object.keys(personalityTypes).forEach(key => {
-          if (!defaultEvents[key]) {
-            defaultEvents[key] = [{
-              id: 'default-' + key,
-              title: '重要人權里程碑',
-              date: '2024年12月10日',
-              description: '這是一個關於人權發展的重要時刻，象徵著我們持續為更美好的世界努力。',
-              tags: ['人權', '自由', '平等'],
-              ig_caption: '每一天都是爭取人權的日子 #人權 #自由 #平等',
-              category: key
-            }];
-          }
-        });
-
-        setFirebaseEvents(defaultEvents);
-        setAllEvents(Object.values(defaultEvents).flat());
-        setLoading(false);
+        if (allList.length > 0) {
+          setAllEvents(allList);
+          setFirebaseEvents(eventsByCategory);
+        }
+      } catch (_) {
+        // 保留 DEFAULT_EVENTS 即可，靜默 fallback
       }
     };
-
     loadEvents();
+    return () => { cancelled = true; };
   }, []);
 
   // 計算結果並選擇合適的事件
@@ -497,14 +468,14 @@ export default function HumanRightsQuizApp() {
   const IntroStage = () => (
     <motion.div
       className="min-h-screen bg-gradient-to-b from-blue-500 to-purple-600 flex flex-col items-center justify-center p-6"
-      initial={{ opacity: 0 }}
+      initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
+        initial={{ scale: 1, opacity: 1 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.5 }}
         className="text-center"
       >
         <h1 className="text-4xl font-bold text-white mb-4">台灣人權史上的一天</h1>
