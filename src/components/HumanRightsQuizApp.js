@@ -2,9 +2,15 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Download, Camera, ChevronRight, Calendar, Heart, Star, RefreshCw, MessageCircle, Bookmark, Send } from 'lucide-react';
+import { 
+  Share2, Download, Camera, ChevronRight, Calendar, Heart, Star, 
+  RefreshCw, MessageCircle, Bookmark, Send, BookOpen, Award, CheckCircle2, 
+  XCircle, Search, HelpCircle, ArrowLeft, History, Shield, Scale, Sparkles
+} from 'lucide-react';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { QUESTION_BANK, TOPIC_CATEGORIES } from '../data/questionBank';
+import { CORE_CONVENTIONS, LEGAL_GLOSSARY } from '../data/conventionsGlossary';
 
 // Firebase配置
 const firebaseConfig = {
@@ -17,7 +23,6 @@ const firebaseConfig = {
   measurementId: "G-VLEN2BESP6"
 };
 
-// 初始化Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -77,27 +82,27 @@ const quizQuestions = [
 const personalityTypes = {
   "正義勇氣型": {
     description: "你是一位充滿正義感的勇者，面對不公不義總是第一個站出來。你相信真理和正義，願意為了保護弱者而奮鬥。",
-    traits: ["勇敢", "正義", "果斷", "無畏"]
+    traits: ["勇敢無懼", "捍衛正義", "果斷行事", "關懷弱勢"]
   },
   "理想主義型": {
-    description: "你是一位充滿理想與熱情的人，對於社會正義有著堅定的信念。你相信透過行動可以改變世界，願意為了理想付出努力。",
-    traits: ["理想", "熱情", "堅持", "信念"]
+    description: "你是一位充滿理想與熱情的人，對於社會正義有著堅定的信念。你相信透過堅持可以改變世界，願意為了理想付出努力。",
+    traits: ["理想遠大", "熱情執著", "堅毅不拔", "洞察社會"]
   },
   "突破傳統型": {
-    description: "你是一位勇於創新的開拓者，不畏懼挑戰傳統觀念。你相信改變才能帶來進步，願意突破舊有框架。",
-    traits: ["創新", "突破", "開放", "進取"]
+    description: "你是一位勇於創新的開拓者，不畏懼挑戰既成觀念。你相信改變才能帶來實質進步，願意突破舊有框架。",
+    traits: ["思想開放", "批判獨立", "勇於突破", "開拓創新"]
   },
   "民主改革型": {
-    description: "你是一位理性的改革者，相信制度的力量。你善於在體制內推動改變，透過民主程序實現理想。",
-    traits: ["理性", "改革", "制度", "協調"]
+    description: "你是一位理性的改革者，深信法治與制度的力量。你善於在體制內推動改變，透過民主正當程序實現公平。",
+    traits: ["理性嚴謹", "制度思維", "善於協商", "法治信念"]
   },
   "社會參與型": {
-    description: "你是一位積極的行動者，重視公民參與的力量。你善用各種管道發聲，相信群眾的力量可以改變社會。",
-    traits: ["參與", "行動", "團結", "發聲"]
+    description: "你是一位積極的行動者，重視公民參與的力量。你善用各種管道發聲，深信群眾團結足以推動社會前進。",
+    traits: ["團結大眾", "積極倡議", "熱忱參與", "行動實踐"]
   },
   "平等包容型": {
-    description: "你是一位包容的和平使者，尊重每個人的差異。你相信愛與理解可以化解歧見，追求一個更平等的社會。",
-    traits: ["包容", "平等", "尊重", "和諧"]
+    description: "你是一位包容的和平使者，真誠尊重每個人的差異。你相信理解與同理可以化解歧見，追求一個沒有歧視的平等社會。",
+    traits: ["多元包容", "同理心強", "促進和諧", "消除偏見"]
   }
 };
 
@@ -105,126 +110,78 @@ const DEFAULT_EVENTS = {
   "正義勇氣型": [
     {
       id: 'default-justice-courage-1',
-      title: '二二八事件',
+      title: '二二八事件與民權追尋',
       date: '1947-02-28',
-      description: '由於政府查緝私菸的不當行為引發民眾抗議，隨後演變成全島性的抗爭。政府派軍隊鎮壓，造成大量台灣菁英被逮捕、處決或失蹤的慘劇。展現了人民面對不公不義時挺身而出的勇氣。',
-      tags: ['歷史事件', '政府鎮壓', '民眾抗爭', '轉型正義'],
-      ig_caption: '1947年的二二八事件是台灣追求民主與人權的重要里程碑，提醒我們站出來對抗不公義的重要性 #二二八 #轉型正義 #人權歷史',
+      description: '查緝私菸事件引發全島性抗爭，人民挺身反抗體制不義，奠定台灣民主法治轉型的重要歷史起點。',
+      tags: ['歷史事件', '民權覺醒', '轉型正義'],
       category: '正義勇氣型'
     },
     {
       id: 'default-justice-courage-2',
-      title: '四六事件',
+      title: '四六事件與學術自由抗爭',
       date: '1949-04-06',
-      description: '1949年，台灣的學生因抗議警方逮捕同學而展開運動，顯示了當時社會對於自由與正義的渴望。',
-      tags: ['學生運動', '抗議', '歷史', '台灣', '社會'],
-      ig_caption: '✊ 學生的聲音不可忽視！四六事件讓我們看到勇氣與團結的力量！📣 #學生運動 #追求自由',
+      description: '大專學生因抗議軍警進入校園逮捕同學展開爭取大學自治與思想自由之運動。',
+      tags: ['學生運動', '學術自由', '人權捍衛'],
       category: '正義勇氣型'
     }
   ],
   "理想主義型": [
     {
       id: 'default-idealism-1',
-      title: '台灣解嚴',
-      date: '1987-07-15',
-      description: '台灣結束長達38年的戒嚴時期，開啟了政治自由化與民主化的進程，是台灣民主發展的重要里程碑。',
-      tags: ['解嚴', '民主化', '自由化', '政治變革'],
-      ig_caption: '1987年的今天，台灣結束了長達38年的戒嚴時期，開啟了自由與民主的新時代。每一個理想主義者的堅持，都是推動社會前進的力量 #解嚴 #台灣民主化 #理想的力量',
-      category: '理想主義型'
-    },
-    {
-      id: 'default-idealism-2',
-      title: '雷震案',
-      date: '1960-09-04',
-      description: '雷震創辦的《自由中國》雜誌主張台灣必須推行民主改革，並計劃組織反對黨。國民黨當局以「為匪宣傳」罪名，逮捕雷震與其他參與人士，阻礙了台灣民主發展。',
-      tags: ['政治案件', '言論自由', '民主運動', '白色恐怖'],
-      ig_caption: '理想主義者雷震為台灣推動民主改革而犧牲，他的《自由中國》雜誌為台灣民主種下重要的種子 #理想主義 #民主先驅 #言論自由',
+      title: '美麗島事件與民主先行者的審判',
+      date: '1979-12-10',
+      description: '世界人權日大會遭受戒嚴軍警大規模逮捕與軍法審判，促發民間對解除戒嚴與政治自由的廣泛爭取。',
+      tags: ['世界人權日', '政治自由', '軍法審判'],
       category: '理想主義型'
     }
   ],
   "突破傳統型": [
     {
       id: 'default-breakthrough-1',
-      title: '鄭南榕自焚事件',
+      title: '鄭南榕爭取百分之百言論自由',
       date: '1989-04-07',
-      description: '《自由時代》雜誌社社長鄭南榕為了捍衛「百分之百的言論自由」，在被控叛亂罪遭傳訊時，在雜誌社內自焚身亡，成為台灣爭取言論自由的象徵人物。',
-      tags: ['言論自由', '民主運動', '媒體自由', '政治抗爭'],
-      ig_caption: '「爭取百分之百的言論自由」，鄭南榕用生命捍衛信念，突破威權時代的禁忌，他的犧牲讓我們得以在自由的土地上發聲 #言論自由 #突破傳統 #鄭南榕',
-      category: '突破傳統型'
-    },
-    {
-      id: 'default-breakthrough-2',
-      title: '黨外雜誌創刊風潮',
-      date: '1979-08-16',
-      description: '1970年代末期，《美麗島》、《八十年代》等黨外雜誌相繼創刊，突破新聞管制，開啟台灣媒體自由化的先河。',
-      tags: ['媒體自由', '黨外運動', '突破傳統', '民主化'],
-      ig_caption: '突破傳統框架的先行者們，用文字打破言論封鎖，為台灣的自由開創了新的可能 #黨外雜誌 #美麗島 #突破傳統',
+      description: '堅持刊印台灣新憲法草案，以生命捍衛言論與思想自由，催生後續廢除刑法第一百條的民主改革。',
+      tags: ['言論自由', '思想自主', '憲法改革'],
       category: '突破傳統型'
     }
   ],
   "民主改革型": [
     {
-      id: 'default-democratic-reform-1',
-      title: '國會全面改選',
-      date: '1991-12-21',
-      description: '1991年國民大會代表全面改選，終結了「萬年國會」的歷史，是台灣民主憲政發展的重要里程碑。',
-      tags: ['民主改革', '選舉', '政治制度', '憲政發展'],
-      ig_caption: '結束「萬年國會」，台灣民主向前邁進一大步！每個投下神聖一票的公民，都是民主改革的推手 #國會改革 #民主制度 #憲政發展',
-      category: '民主改革型'
-    },
-    {
-      id: 'default-democratic-reform-2',
-      title: '司法院釋字第748號解釋',
-      date: '2017-05-24',
-      description: '大法官宣告現行民法未保障同性婚姻違憲，促成台灣成為亞洲第一個同性婚姻合法化的國家。',
-      tags: ['婚姻平權', '憲法解釋', '司法改革', '人權里程碑'],
-      ig_caption: '釋字第748號為台灣寫下歷史，讓平等深植於法律制度之中 #婚姻平權 #大法官解釋 #平等改革',
+      id: 'default-reform-1',
+      title: '野百合學運與國會全面改選',
+      date: '1990-03-16',
+      description: '學生在中正紀念堂靜坐提出「解散國民大會、廢除臨時條款、召開國是會議」，推動台灣走向全面普選。',
+      tags: ['民主轉型', '國會改革', '公民運動'],
       category: '民主改革型'
     }
   ],
   "社會參與型": [
     {
-      id: 'default-social-participation-1',
-      title: '美麗島事件',
-      date: '1979-12-10',
-      description: '1979年12月10日國際人權日，黨外人士在高雄舉行集會，後與警方發生衝突，政府隨後逮捕多位黨外領袖，是台灣民主運動的重要轉捩點。',
-      tags: ['民主運動', '社會參與', '政治抗爭', '國際人權日'],
-      ig_caption: '美麗島事件是台灣人民集體意識覺醒的時刻，透過公民的積極參與，我們一起推動社會走向民主與自由 #美麗島事件 #社會參與 #公民行動',
-      category: '社會參與型'
-    },
-    {
-      id: 'default-social-participation-2',
-      title: '野百合學運',
-      date: '1990-03-16',
-      description: '大學生在中正紀念堂靜坐抗議，要求解散國民大會、廢除臨時條款等政治改革，促使李登輝總統接受學生訴求，加速民主化進程。',
-      tags: ['學生運動', '社會參與', '民主改革', '公民行動'],
-      ig_caption: '從野百合學運開始，台灣的年輕人展現了積極參與公共事務的力量，證明每個人都能成為改變的起點 #野百合學運 #社會參與 #青年力量',
+      id: 'default-participation-1',
+      title: '五二〇農民運動與社會弱勢權益',
+      date: '1988-05-20',
+      description: '農民北上爭取農民保險與公平貿易待遇，彰顯公民透過社會運動保障經濟社會權利的力量。',
+      tags: ['社會權利', '農民權益', '公民行動'],
       category: '社會參與型'
     }
   ],
   "平等包容型": [
     {
-      id: 'default-equality-inclusion-1',
-      title: '原住民正名運動',
-      date: '1984-12-29',
-      description: '台灣原住民族要求正名，擺脫「山胞」稱謂，爭取民族尊嚴與平等權利的社會運動，最終在1994年修憲時獲得正式肯認。',
-      tags: ['原住民族', '平等權利', '民族認同', '多元文化'],
-      ig_caption: '尊重多元、平等包容是民主社會的根基，原住民正名運動提醒我們每個群體的尊嚴與權利都應受到保障 #原住民正名 #民族平等 #多元包容',
-      category: '平等包容型'
-    },
-    {
-      id: 'default-equality-inclusion-2',
-      title: '婦女運動與性別平等法案',
-      date: '1987-04-10',
-      description: '解嚴後台灣婦女運動蓬勃發展，推動多項性別平等法案，如《家庭暴力防治法》、《性別平等教育法》等，促進社會更加平等與包容。',
-      tags: ['婦女運動', '性別平等', '法律改革', '社會正義'],
-      ig_caption: '平等與包容的社會，需要每個人的努力與支持，台灣婦女運動的成果讓我們向更公平的未來邁進 #性別平等 #包容社會 #平權法案',
+      id: 'default-equality-1',
+      title: '婚姻平權法案通過與釋字第748號',
+      date: '2019-05-17',
+      description: '司法院釋字第748號解釋確立同性婚姻受憲法保障，立法院三讀通過施行法，成為亞洲性別人權里程碑。',
+      tags: ['婚姻平權', '憲法審查', '性別平等'],
       category: '平等包容型'
     }
   ]
 };
 
 export default function HumanRightsQuizApp() {
+  // 頂層分頁：'practice'（常態題庫）, 'conventions'（公約辭典）, 'event_quiz'（速測活動）, 'records'（答題本）
+  const [activeTab, setActiveTab] = useState('practice');
+
+  // 活動速測狀態 (經典流程)
   const [stage, setStage] = useState('intro'); // intro, quiz, calculating, result, share
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [scores, setScores] = useState({
@@ -235,102 +192,68 @@ export default function HumanRightsQuizApp() {
     "社會參與型": 0,
     "平等包容型": 0
   });
-  const [result, setResult] = useState(null);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [firebaseEvents, setFirebaseEvents] = useState(DEFAULT_EVENTS);
-  const [loading, setLoading] = useState(false);
-  const [allEvents, setAllEvents] = useState(Object.values(DEFAULT_EVENTS).flat());
+  const [result, setResult] = useState("正義勇氣型");
+  const [selectedEvent, setSelectedEvent] = useState(DEFAULT_EVENTS["正義勇氣型"][0]);
   const shareRef = useRef(null);
 
-  // 背景嘗試從 Firebase 更新事件資料（若超時或失敗則保持預設資料）
-  useEffect(() => {
-    let cancelled = false;
-    const loadEvents = async () => {
-      try {
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2500));
-        const eventsCollection = collection(db, 'humanRightsEvents');
-        const snapshot = await Promise.race([getDocs(eventsCollection), timeoutPromise]);
-        if (cancelled || !snapshot || snapshot.empty) return;
+  // 常態題庫練習狀態
+  const [selectedCategory, setSelectedCategory] = useState('全部題目');
+  const [practiceIndex, setPracticeIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState({}); // { [questionId]: { selectedIdx, isCorrect } }
+  const [showExplanation, setShowExplanation] = useState(false);
 
-        const eventsByCategory = {
-          "正義勇氣型": [],
-          "理想主義型": [],
-          "突破傳統型": [],
-          "民主改革型": [],
-          "社會參與型": [],
-          "平等包容型": []
-        };
-        const allList = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          allList.push({ id: doc.id, ...data });
-          if (data.category && eventsByCategory[data.category]) {
-            eventsByCategory[data.category].push({ id: doc.id, ...data });
-          }
-        });
-        if (allList.length > 0) {
-          setAllEvents(allList);
-          setFirebaseEvents(eventsByCategory);
-        }
-      } catch (_) {
-        // 保留 DEFAULT_EVENTS 即可，靜默 fallback
-      }
-    };
-    loadEvents();
-    return () => { cancelled = true; };
+  // 公約與辭典搜尋
+  const [glossarySearch, setGlossarySearch] = useState('');
+
+  // 讀取/儲存答題紀錄
+  const [quizHistory, setQuizHistory] = useState([]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('hr_quiz_history');
+      if (saved) setQuizHistory(JSON.parse(saved));
+    } catch (_) {}
   }, []);
 
-  // 計算結果並選擇合適的事件
-  const calculateResult = () => {
-    // 找出得分最高的類型
-    const maxScore = Math.max(...Object.values(scores));
-    const resultType = Object.keys(scores).find(key => scores[key] === maxScore);
-
-    setResult(resultType);
-
-    // 檢查是否有該類型的事件
-    let events = firebaseEvents[resultType] || [];
-
-    // 如果沒有該類型的事件，從所有事件中隨機選擇一個
-    if (events.length === 0) {
-      console.log(`沒有找到${resultType}類型的事件，使用隨機事件代替`);
-      if (allEvents.length > 0) {
-        events = allEvents;
-      } else {
-        // 提供一個預設事件作為最後的後備方案
-        events = [{
-          id: 'emergency-default',
-          title: '世界人權日',
-          date: '1980年代',
-          description: '世界人權日紀念《世界人權宣言》的通過，提醒我們人權的普世價值。',
-          tags: ['人權', '聯合國', '國際日'],
-          ig_caption: '每年的今天，讓我們一起守護人權的價值 #世界人權日 #人權 #平等',
-          category: resultType
-        }];
-      }
-    }
-
-    // 隨機選擇一個事件，並確保日期格式一致
-    const randomEvent = events[Math.floor(Math.random() * events.length)];
-
-    // 如果是日期格式為YYYY-MM-DD，取出年份部分添加「年代」
-    if (randomEvent.date && randomEvent.date.match(/^\d{4}(-|\/)/)) {
-      randomEvent.formattedDate = randomEvent.date.substring(0, 4) + '年代';
-    } else {
-      randomEvent.formattedDate = randomEvent.date;
-    }
-
-    setSelectedEvent(randomEvent);
-
-    // 轉換到結果頁面
-    setStage('result');
+  const saveHistory = (record) => {
+    try {
+      const updated = [record, ...quizHistory.slice(0, 49)];
+      setQuizHistory(updated);
+      localStorage.setItem('hr_quiz_history', JSON.stringify(updated));
+    } catch (_) {}
   };
 
-  // 處理答案選擇
-  const handleAnswer = (option) => {
+  // 篩選常態題庫
+  const filteredQuestions = selectedCategory === '全部題目' 
+    ? QUESTION_BANK 
+    : QUESTION_BANK.filter(q => q.category === selectedCategory);
+  
+  const currentPracticeQ = filteredQuestions[practiceIndex] || filteredQuestions[0];
+
+  // 常態題庫答題
+  const handleSelectPracticeOption = (optionIdx) => {
+    if (userAnswers[currentPracticeQ.id] !== undefined) return; // 已作答過
+    const isCorrect = currentPracticeQ.options[optionIdx].isCorrect;
+    const ansData = { selectedIdx: optionIdx, isCorrect, timestamp: new Date().toLocaleString() };
+    
+    const nextAnswers = { ...userAnswers, [currentPracticeQ.id]: ansData };
+    setUserAnswers(nextAnswers);
+    setShowExplanation(true);
+
+    saveHistory({
+      id: `${currentPracticeQ.id}-${Date.now()}`,
+      question: currentPracticeQ.question,
+      category: currentPracticeQ.category,
+      isCorrect,
+      date: new Date().toLocaleDateString()
+    });
+  };
+
+  // 經典活動答題邏輯
+  const handleAnswer = (optionScores) => {
     const newScores = { ...scores };
-    Object.keys(option.scores).forEach(type => {
-      newScores[type] += option.scores[type];
+    Object.keys(optionScores).forEach(key => {
+      newScores[key] = (newScores[key] || 0) + optionScores[key];
     });
     setScores(newScores);
 
@@ -339,14 +262,24 @@ export default function HumanRightsQuizApp() {
     } else {
       setStage('calculating');
       setTimeout(() => {
-        calculateResult();
-      }, 2000);
+        // 計算結果
+        let maxVal = -1;
+        let bestKey = "正義勇氣型";
+        Object.entries(newScores).forEach(([k, v]) => {
+          if (v > maxVal) {
+            maxVal = v;
+            bestKey = k;
+          }
+        });
+        setResult(bestKey);
+        const evList = DEFAULT_EVENTS[bestKey] || DEFAULT_EVENTS["正義勇氣型"];
+        setSelectedEvent(evList[Math.floor(Math.random() * evList.length)]);
+        setStage('result');
+      }, 1000);
     }
   };
 
-  // 重新開始
-  const restart = () => {
-    setStage('intro');
+  const restartEventQuiz = () => {
     setCurrentQuestion(0);
     setScores({
       "正義勇氣型": 0,
@@ -356,443 +289,633 @@ export default function HumanRightsQuizApp() {
       "社會參與型": 0,
       "平等包容型": 0
     });
-    setResult(null);
-    setSelectedEvent(null);
+    setStage('intro');
   };
 
-  // 下載圖片
+  // 截圖下載功能 (邊界正常化，確保內距與文字不貼邊)
   const downloadImage = async () => {
     try {
       const domtoimage = (await import('dom-to-image')).default;
-      if (!shareRef.current) {
-        console.error('分享元素參考不存在');
-        return;
-      }
-
-      // 使用 dom-to-image 生成圖片
       const element = shareRef.current;
-
-      // 確保元素的樣式正確，避免偏移
-      const originalStyle = element.style.cssText;
-      element.style.margin = '0';
-      element.style.padding = '0';
-      element.style.transform = 'translate(0, 0)';
-
-      // 設定輸出圖片的寬度和高度
-      const width = element.offsetWidth * 2; // 2 倍寬度
-      const height = element.offsetHeight * 2; // 2 倍高度
+      if (!element) return;
 
       const dataUrl = await domtoimage.toPng(element, {
-        width: width, // 設定圖片寬度
-        height: height, // 設定圖片高度
-        quality: 1, // 設置圖片質量
-        bgcolor: '#ffffff', // 背景顏色
+        bgcolor: '#ffffff',
+        quality: 1,
+        width: element.offsetWidth * 2,
+        height: element.offsetHeight * 2,
         style: {
-          transform: 'scale(2)', // 確保縮放比例正確
-          transformOrigin: 'top left', // 設置縮放原點
-        },
+          transform: 'scale(2)',
+          transformOrigin: 'top left'
+        }
       });
 
-      // 恢復原始樣式
-      element.style.cssText = originalStyle;
-
       const link = document.createElement('a');
-      const formattedDate = selectedEvent?.formattedDate || '人權日';
-      link.download = `my-human-rights-day-${formattedDate}.png`;
+      link.download = `human-rights-card-${result}.png`;
       link.href = dataUrl;
       link.click();
     } catch (error) {
-      console.error('截圖失敗:', error);
-      alert('圖片下載失敗，請稍後再試。');
+      console.error('截圖下載失敗', error);
+      alert('圖片生成失敗，建議使用手機內建截圖或稍後重試。');
     }
   };
 
-  // 分享功能
   const shareImage = async () => {
     try {
       const domtoimage = (await import('dom-to-image')).default;
-      if (!shareRef.current) {
-        console.error('分享元素參考不存在');
-        return;
-      }
-
-      // 使用 dom-to-image 生成圖片
       const element = shareRef.current;
-
-      // 確保元素的樣式正確，避免偏移
-      const originalStyle = element.style.cssText;
-      element.style.margin = '0';
-      element.style.padding = '0';
-      element.style.transform = 'translate(0, 0)';
-
-      // 設定輸出圖片的寬度和高度
-      const width = element.offsetWidth * 2; // 2 倍寬度
-      const height = element.offsetHeight * 2; // 2 倍高度
+      if (!element) return;
 
       const dataUrl = await domtoimage.toPng(element, {
-        width: width, // 設定圖片寬度
-        height: height, // 設定圖片高度
-        quality: 1, // 設置圖片質量
-        bgcolor: '#ffffff', // 背景顏色
+        bgcolor: '#ffffff',
+        quality: 1,
+        width: element.offsetWidth * 2,
+        height: element.offsetHeight * 2,
         style: {
-          transform: 'scale(2)', // 確保縮放比例正確
-          transformOrigin: 'top left', // 設置縮放原點
-        },
+          transform: 'scale(2)',
+          transformOrigin: 'top left'
+        }
       });
 
-      // 恢復原始樣式
-      element.style.cssText = originalStyle;
-
       const blob = await fetch(dataUrl).then(res => res.blob());
-      const file = new File([blob], 'human-rights-day.png', { type: 'image/png' });
+      const file = new File([blob], `human-rights-${result}.png`, { type: 'image/png' });
 
-      if (navigator.share && navigator.canShare({ files: [file] })) {
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: '我的人權史上的一天',
-          text: `我是${result}！在社會運動中扮演著重要角色！一起來測測你在人權發展中的定位吧！`
+          title: `我的人權史上的一天：${result}`,
+          text: `我在清大人權知識平台測出「${result}」！快來測測你的歷史定位。`
         });
       } else {
-        const link = document.createElement('a');
-        link.download = 'human-rights-day.png';
-        link.href = dataUrl;
-        link.click();
+        downloadImage();
       }
-    } catch (error) {
-      console.error('分享失敗:', error);
-      alert('分享失敗，請稍後再試。');
+    } catch (e) {
+      downloadImage();
     }
   };
 
-  // Intro畫面
-  const IntroStage = () => (
-    <motion.div
-      className="min-h-screen bg-gradient-to-b from-blue-500 to-purple-600 flex flex-col items-center justify-center p-6"
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <motion.div
-        initial={{ scale: 1, opacity: 1 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="text-center"
-      >
-        <h1 className="text-4xl font-bold text-white mb-4">台灣人權史上的一天</h1>
-        <p className="text-xl text-white/90 mb-4">探索你的人格特質<br />找到專屬於你的歷史時刻</p>
-
-        <div className="mb-8">
-          <p className="text-lg text-white/80 mb-2">清大學生會人權部</p>
-          <p className="text-lg text-white/80">清音祭特別企劃</p>
-        </div>
-
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setStage('quiz')}
-          className="bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg shadow-lg flex items-center gap-2 transition-colors duration-200 hover:bg-blue-50"
-          disabled={loading}
-        >
-          {loading ? '載入中...' : '開始測驗'} <ChevronRight />
-        </motion.button>
-      </motion.div>
-    </motion.div>
-  );
-
-  // 測驗畫面
-  const QuizStage = () => (
-    <motion.div
-      className="min-h-screen bg-gradient-to-b from-blue-500 to-purple-600 p-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="max-w-md mx-auto">
-        {/* 進度條 */}
-        <div className="mb-8">
-          <div className="h-2 bg-white/30 rounded-full">
-            <motion.div
-              className="h-full bg-white rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
-              transition={{ duration: 0.3 }}
-            />
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+      {/* 頂部專業機構導航門戶列 */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-amber-700 text-white flex items-center justify-center font-serif font-bold text-xl shadow">
+              權
+            </div>
+            <div>
+              <div className="font-bold text-base text-slate-900 tracking-tight flex items-center gap-2">
+                人權知識互動問答與法學智庫
+                <span className="text-xs px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-mono">清大學生會人權部</span>
+              </div>
+              <div className="text-xs text-slate-500 font-mono">Human Rights Jurisprudence & Practice System</div>
+            </div>
           </div>
-          <p className="text-white/80 text-sm mt-2">
-            問題 {currentQuestion + 1} / {quizQuestions.length}
-          </p>
-        </div>
 
-        {/* 問題 */}
-        <motion.div
-          key={currentQuestion}
-          initial={{ x: 50, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="bg-white rounded-2xl p-6 mb-6 shadow-xl"
-        >
-          <h2 className="text-xl font-bold text-gray-800 mb-4">
-            {quizQuestions[currentQuestion].question}
-          </h2>
-        </motion.div>
-
-        {/* 選項 */}
-        <div className="space-y-3">
-          {quizQuestions[currentQuestion].options.map((option, index) => (
-            <motion.button
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleAnswer(option)}
-              className="w-full bg-white/90 hover:bg-white text-gray-800 p-4 rounded-xl text-left shadow-md transition-all duration-200"
+          {/* 模組分頁按鈕 */}
+          <nav className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs sm:text-sm font-medium">
+            <button
+              onClick={() => setActiveTab('practice')}
+              className={`px-3 py-1.5 rounded-md transition-all ${activeTab === 'practice' ? 'bg-white text-slate-900 shadow-sm font-semibold' : 'text-slate-600 hover:text-slate-900'}`}
             >
-              {option.text}
-            </motion.button>
-          ))}
+              常態題庫實戰
+            </button>
+            <button
+              onClick={() => setActiveTab('conventions')}
+              className={`px-3 py-1.5 rounded-md transition-all ${activeTab === 'conventions' ? 'bg-white text-slate-900 shadow-sm font-semibold' : 'text-slate-600 hover:text-slate-900'}`}
+            >
+              公約與法學辭典
+            </button>
+            <button
+              onClick={() => setActiveTab('event_quiz')}
+              className={`px-3 py-1.5 rounded-md transition-all ${activeTab === 'event_quiz' ? 'bg-white text-slate-900 shadow-sm font-semibold' : 'text-slate-600 hover:text-slate-900'}`}
+            >
+              經典活動速測
+            </button>
+            <button
+              onClick={() => setActiveTab('records')}
+              className={`px-3 py-1.5 rounded-md transition-all ${activeTab === 'records' ? 'bg-white text-slate-900 shadow-sm font-semibold' : 'text-slate-600 hover:text-slate-900'}`}
+            >
+              練習紀錄 ({quizHistory.length})
+            </button>
+          </nav>
         </div>
-      </div>
-    </motion.div>
-  );
+      </header>
 
-  // 計算中畫面
-  const CalculatingStage = () => (
-    <motion.div
-      className="min-h-screen bg-gradient-to-b from-blue-500 to-purple-600 flex items-center justify-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="text-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="w-20 h-20 border-4 border-white border-t-transparent rounded-full mx-auto mb-4"
-        />
-        <p className="text-white text-xl">正在分析你的人格特質...</p>
-      </div>
-    </motion.div>
-  );
-
-  // 結果畫面
-  const ResultStage = () => (
-    <motion.div
-      className="min-h-screen bg-gradient-to-b from-blue-500 to-purple-600 p-6 overflow-auto"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="max-w-md mx-auto">
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="bg-white rounded-2xl p-6 mb-6 shadow-xl"
-        >
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            你是 {result}
-          </h2>
-          <p className="text-gray-600 mb-4">
-            {personalityTypes[result]?.description}
-          </p>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {personalityTypes[result]?.traits.map((trait, index) => (
-              <span key={index} className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">
-                {trait}
-              </span>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          className="bg-white rounded-2xl p-6 mb-6 shadow-xl"
-        >
-          <h3 className="text-xl font-bold text-gray-800 mb-4">
-            你的人權史上的一天
-          </h3>
-          <div className="mb-4">
-            <Calendar className="inline mr-2 text-blue-600" />
-            <span className="text-lg font-semibold">{selectedEvent?.date}</span>
-          </div>
-          <h4 className="font-bold text-gray-800 mb-2">{selectedEvent?.title}</h4>
-          <p className="text-gray-600 mb-4">{selectedEvent?.description}</p>
-          <div className="flex flex-wrap gap-2">
-            {selectedEvent?.tags && selectedEvent.tags.map((tag, index) => (
-              <span key={index} className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">
-                #{tag}
-              </span>
-            ))}
-          </div>
-        </motion.div>
-
-        <div className="flex gap-3">
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => setStage('share')}
-            className="flex-1 bg-white text-blue-600 px-6 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 transition-all duration-200"
-          >
-            <Camera /> 分享結果
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={restart}
-            className="bg-white/20 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 transition-all duration-200"
-          >
-            <RefreshCw size={20} />
-          </motion.button>
-        </div>
-      </div>
-    </motion.div>
-  );
-
-  // 分享畫面 - 重新設計的IG貼文
-  const ShareStage = () => (
-    <motion.div
-      className="min-h-screen bg-gray-100 p-6 overflow-auto"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="max-w-md mx-auto">
-        {/* IG樣式卡片 - 固定寬度避免跑版 */}
-        <div
-          ref={shareRef}
-          className="bg-white rounded-2xl shadow-xl overflow-hidden mb-6"
-          style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}
-        >
-          {/* 完整IG貼文設計 */}
-          <div className="relative">
-            {/* 主要內容區 */}
-            <div className="bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-1">
-              <div className="bg-white p-4">
-                {/* IG風格頭部 */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
-                      {result?.charAt(0)}
-                    </div>
-                    <div className="ml-2">
-                      <div className="font-bold text-sm text-gray-900">人權史上的一天</div>
-                      <div className="text-xs text-gray-500">清大學生會人權部</div>
-                    </div>
-                  </div>
-                  <div className="text-blue-600">
-                    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                    </svg>
-                  </div>
+      {/* 主內容區 */}
+      <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6">
+        {/* =========================================================
+            分頁 1：常態題庫實戰
+           ========================================================= */}
+        {activeTab === 'practice' && (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* 左側主題分類 */}
+            <div className="lg:col-span-1 space-y-2">
+              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <h3 className="font-bold text-sm text-slate-800 mb-3 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-amber-700" />
+                  測驗法學範疇
+                </h3>
+                <div className="space-y-1">
+                  {TOPIC_CATEGORIES.map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        setSelectedCategory(cat);
+                        setPracticeIndex(0);
+                        setShowExplanation(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors flex items-center justify-between ${
+                        selectedCategory === cat 
+                          ? 'bg-amber-700 text-white font-medium' 
+                          : 'text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span className="truncate">{cat}</span>
+                      <span className="font-mono text-xs opacity-75">
+                        {cat === '全部題目' ? QUESTION_BANK.length : QUESTION_BANK.filter(q => q.category === cat).length}
+                      </span>
+                    </button>
+                  ))}
                 </div>
+              </div>
 
-                {/* 貼文內容 - 重新設計，突出用戶角色而非事件 */}
-                <div className="relative">
-                  <div className="aspect-square bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-xl p-4 flex flex-col justify-center items-center text-center">
-                    <div className="mb-3">
-                      <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-2xl mb-3">
-                        {result?.charAt(0)}
-                      </div>
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                        {result}
-                      </h3>
-                      {/* 顯示人格特質 */}
-                      <div className="flex flex-wrap gap-1 justify-center mb-3">
-                        {personalityTypes[result]?.traits.map((trait, index) => (
-                          <span key={index} className="bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium">
-                            {trait}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* 簡短描述用戶可以做什麼 */}
-                    <div className="mb-4">
-                      <p className="text-sm text-gray-700 leading-relaxed max-w-xs mb-3">
-                        {personalityTypes[result]?.description}
-                      </p>
-                    </div>
-
-                    {/* 推薦的歷史時刻 - 使用傳統布局避免截圖時跑版 */}
-                    <div className="w-full bg-gradient-to-r from-blue-100 to-purple-100 p-3 rounded-lg relative" style={{ minHeight: '80px' }}>
-                      <div className="text-xs text-gray-500 mb-1">在人權史上的一天</div>
-                      <div className="text-sm font-bold text-gray-900 mb-1">
-                        {selectedEvent?.formattedDate || (selectedEvent?.date ? selectedEvent.date.substring(0, 4) + '年代' : '1980年代')}
-                      </div>
-                      <div className="text-xs font-medium text-gray-700" style={{ maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                        {selectedEvent?.title}
-                      </div>
-                    </div>
-                  </div>
+              {/* 答題進度小卡 */}
+              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-xs space-y-2">
+                <div className="flex justify-between text-slate-500 font-mono">
+                  <span>本組完成進度</span>
+                  <span>{practiceIndex + 1} / {filteredQuestions.length}</span>
                 </div>
+                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-amber-700 h-full transition-all duration-300"
+                    style={{ width: `${((practiceIndex + 1) / filteredQuestions.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+            </div>
 
-                {/* IG互動區 */}
-                <div className="mt-3">
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex gap-3">
-                      <Heart className="w-5 h-5 text-gray-800 hover:text-red-500 cursor-pointer transition-colors" />
-                      <MessageCircle className="w-5 h-5 text-gray-800 hover:text-blue-500 cursor-pointer transition-colors" />
-                      <Send className="w-5 h-5 text-gray-800 hover:text-purple-500 cursor-pointer transition-colors" />
-                    </div>
-                    <Bookmark className="w-5 h-5 text-gray-800 hover:text-yellow-500 cursor-pointer transition-colors" />
-                  </div>
-                  <div className="text-xs font-semibold mb-1">1,210 個讚</div>
-                  <div className="text-xs">
-                    <span className="font-semibold">清大學生會人權部</span>
-                    <span className="ml-1 text-gray-600">
-                      我是{result}，在社會運動中扮演著重要角色！一起來測測你在人權發展中的定位吧 ✨ #人權測驗 #{result}
+            {/* 右側題庫卡片 */}
+            <div className="lg:col-span-3 space-y-4">
+              <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold rounded">
+                      {currentPracticeQ.category}
+                    </span>
+                    <span className="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded font-mono">
+                      難度：{currentPracticeQ.level}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-400 mt-1">DECEMBER 10</div>
+                  <span className="text-xs font-mono text-slate-400">
+                    題號 #{currentPracticeQ.id}
+                  </span>
+                </div>
+
+                {/* 題目主體 */}
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-relaxed">
+                  {currentPracticeQ.question}
+                </h2>
+
+                {/* 選項列表 */}
+                <div className="space-y-3">
+                  {currentPracticeQ.options.map((opt, oIdx) => {
+                    const ans = userAnswers[currentPracticeQ.id];
+                    let btnStyle = "border-slate-200 hover:border-slate-300 bg-white text-slate-800";
+                    if (ans !== undefined) {
+                      if (opt.isCorrect) {
+                        btnStyle = "border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold";
+                      } else if (ans.selectedIdx === oIdx && !opt.isCorrect) {
+                        btnStyle = "border-rose-500 bg-rose-50 text-rose-900 line-through opacity-80";
+                      } else {
+                        btnStyle = "border-slate-200 bg-slate-50 text-slate-400";
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={oIdx}
+                        disabled={ans !== undefined}
+                        onClick={() => handleSelectPracticeOption(oIdx)}
+                        className={`w-full p-4 rounded-xl border text-left text-sm leading-relaxed transition-all flex items-start gap-3 ${btnStyle}`}
+                      >
+                        <span className="w-6 h-6 rounded-full border border-current flex items-center justify-center text-xs font-mono flex-shrink-0 mt-0.5">
+                          {['A', 'B', 'C', 'D'][oIdx]}
+                        </span>
+                        <span className="flex-1">{opt.text}</span>
+                        {ans !== undefined && opt.isCorrect && (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                        )}
+                        {ans !== undefined && ans.selectedIdx === oIdx && !opt.isCorrect && (
+                          <XCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* 解析與法條依據 */}
+                {(showExplanation || userAnswers[currentPracticeQ.id] !== undefined) && (
+                  <div className="bg-amber-50/60 border border-amber-200 rounded-xl p-5 space-y-3 text-sm">
+                    <div className="font-bold text-amber-900 flex items-center gap-2">
+                      <Scale className="w-4 h-4 text-amber-800" />
+                      法學解析與公約參照
+                    </div>
+                    <p className="text-slate-700 leading-relaxed">
+                      {currentPracticeQ.explanation}
+                    </p>
+                    <div className="pt-2 border-t border-amber-200/60 text-xs font-mono text-amber-800">
+                      依據文獻：{currentPracticeQ.reference}
+                    </div>
+                  </div>
+                )}
+
+                {/* 題庫上一題/下一題翻頁 */}
+                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                  <button
+                    disabled={practiceIndex === 0}
+                    onClick={() => {
+                      setPracticeIndex(Math.max(0, practiceIndex - 1));
+                      setShowExplanation(false);
+                    }}
+                    className="px-4 py-2 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 disabled:opacity-30 hover:bg-slate-50 transition-colors"
+                  >
+                    ← 上一題
+                  </button>
+                  <button
+                    disabled={practiceIndex >= filteredQuestions.length - 1}
+                    onClick={() => {
+                      setPracticeIndex(Math.min(filteredQuestions.length - 1, practiceIndex + 1));
+                      setShowExplanation(false);
+                    }}
+                    className="px-5 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-xs font-semibold disabled:opacity-30 transition-colors"
+                  >
+                    下一題 →
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* 分享按鈕 */}
-        <div className="flex gap-3">
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={shareImage}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 transition-all duration-200"
-          >
-            <Share2 /> 分享
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={downloadImage}
-            className="flex-1 bg-gray-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 transition-all duration-200"
-          >
-            <Download /> 下載
-          </motion.button>
-        </div>
+        {/* =========================================================
+            分頁 2：公約體系與法學辭典
+           ========================================================= */}
+        {activeTab === 'conventions' && (
+          <div className="space-y-6">
+            {/* 搜尋條 */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200 flex items-center gap-3 shadow-sm">
+              <Search className="w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="搜尋公約條文、法學名詞（如：不遣返原則、審判權、酷刑定義、比例原則）..."
+                value={glossarySearch}
+                onChange={(e) => setGlossarySearch(e.target.value)}
+                className="w-full text-sm outline-none bg-transparent text-slate-800 placeholder-slate-400"
+              />
+            </div>
 
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={restart}
-          className="w-full mt-4 bg-gray-200 text-gray-600 px-6 py-3 rounded-xl font-bold transition-all duration-200"
-        >
-          重新測驗
-        </motion.button>
-      </div>
-    </motion.div>
-  );
+            {/* 四大核心公約卡片 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {CORE_CONVENTIONS.filter(c => 
+                c.name.includes(glossarySearch) || 
+                c.abbr.toLowerCase().includes(glossarySearch.toLowerCase()) ||
+                c.desc.includes(glossarySearch)
+              ).map(c => (
+                <div key={c.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-mono text-xs font-semibold">
+                        {c.abbr}
+                      </span>
+                      <h3 className="text-base font-bold text-slate-900 mt-1">{c.name}</h3>
+                      <div className="text-xs text-slate-400 font-mono">{c.enName}</div>
+                    </div>
+                    <span className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded border border-amber-200 font-mono">
+                      {c.year}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">{c.desc}</p>
+                  <div className="space-y-2 pt-2 border-t border-slate-100">
+                    <div className="text-xs font-bold text-slate-800">代表性條文精要：</div>
+                    {c.articles.map((art, aIdx) => (
+                      <div key={aIdx} className="text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                        <span className="font-bold text-amber-800 mr-2">{art.num}【{art.title}】</span>
+                        <span className="text-slate-600">{art.summary}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
 
-  return (
-    <AnimatePresence mode="wait">
-      {stage === 'intro' && <IntroStage key="intro" />}
-      {stage === 'quiz' && <QuizStage key="quiz" />}
-      {stage === 'calculating' && <CalculatingStage key="calculating" />}
-      {stage === 'result' && <ResultStage key="result" />}
-      {stage === 'share' && <ShareStage key="share" />}
-    </AnimatePresence>
+            {/* 核心法學名詞專區 */}
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-amber-700" />
+                憲政公法與國際人權核心辭典
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {LEGAL_GLOSSARY.filter(g => 
+                  g.term.includes(glossarySearch) || g.def.includes(glossarySearch)
+                ).map((g, gIdx) => (
+                  <div key={gIdx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2">
+                    <span className="text-xs font-mono text-amber-800 bg-amber-100/60 px-2 py-0.5 rounded">
+                      {g.category}
+                    </span>
+                    <h4 className="font-bold text-sm text-slate-900">{g.term}</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed">{g.def}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================
+            分頁 3：經典活動速測（人權史上的一天）
+           ========================================================= */}
+        {activeTab === 'event_quiz' && (
+          <div className="max-w-2xl mx-auto">
+            {stage === 'intro' && (
+              <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center space-y-6">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-50 text-amber-800 border border-amber-200 flex items-center justify-center font-serif text-2xl font-black shadow-inner">
+                  史
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-2">台灣人權史上的一天</h2>
+                  <p className="text-slate-600 text-sm max-w-md mx-auto leading-relaxed">
+                    透過 5 道情境測驗，探索你的公民性格與正義特質，並為你配對專屬於你的歷史抗爭時刻。
+                  </p>
+                </div>
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs text-slate-500 font-mono">
+                  活動特別企劃 · 清華大學學生會人權部
+                </div>
+                <button
+                  onClick={() => setStage('quiz')}
+                  className="px-8 py-3.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-bold shadow transition-all duration-200 flex items-center justify-center gap-2 mx-auto"
+                >
+                  開始速測 <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {stage === 'quiz' && (
+              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+                <div className="flex justify-between items-center text-xs font-mono text-slate-500 border-b border-slate-100 pb-3">
+                  <span>問題 {currentQuestion + 1} / {quizQuestions.length}</span>
+                  <span>人權性格分析</span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 leading-relaxed">
+                  {quizQuestions[currentQuestion].question}
+                </h3>
+                <div className="space-y-3">
+                  {quizQuestions[currentQuestion].options.map((opt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleAnswer(opt.scores)}
+                      className="w-full p-4 rounded-xl border border-slate-200 hover:border-amber-700 hover:bg-amber-50/50 text-left text-sm text-slate-800 transition-all leading-relaxed"
+                    >
+                      {opt.text}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {stage === 'calculating' && (
+              <div className="bg-white rounded-2xl p-12 border border-slate-200 shadow-sm text-center space-y-4">
+                <div className="w-12 h-12 border-3 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto" />
+                <p className="text-sm font-semibold text-slate-700">正在分析你的人權性格特質與歷史時刻...</p>
+              </div>
+            )}
+
+            {stage === 'result' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono text-amber-800 bg-amber-50 px-2 py-1 rounded border border-amber-200">
+                      測驗結果
+                    </span>
+                    <span className="text-xs text-slate-400 font-mono">人權歷史角色</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900">
+                    你是【{result}】
+                  </h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    {personalityTypes[result]?.description}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 pt-2">
+                    {personalityTypes[result]?.traits.map((t, idx) => (
+                      <span key={idx} className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded text-xs font-medium">
+                        #{t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {selectedEvent && (
+                  <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-3">
+                    <div className="flex items-center gap-2 text-xs font-mono text-amber-800">
+                      <Calendar className="w-4 h-4" />
+                      歷史時刻：{selectedEvent.date}
+                    </div>
+                    <h4 className="text-lg font-bold text-slate-900">{selectedEvent.title}</h4>
+                    <p className="text-sm text-slate-600 leading-relaxed">{selectedEvent.description}</p>
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setStage('share')}
+                    className="flex-1 bg-amber-700 hover:bg-amber-800 text-white px-6 py-3.5 rounded-xl font-bold shadow flex items-center justify-center gap-2 transition-all"
+                  >
+                    <Camera className="w-4 h-4" /> 預覽並生成分享卡片
+                  </button>
+                  <button
+                    onClick={restartEventQuiz}
+                    className="px-5 py-3.5 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 transition-all"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* 分享卡片畫面（徹底修復邊界與間距，保證精緻優雅不貼邊） */}
+            {stage === 'share' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => setStage('result')}
+                    className="text-xs font-mono text-slate-500 hover:text-slate-900 flex items-center gap-1"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" /> 返回結果
+                  </button>
+                  <span className="text-xs font-mono text-slate-400">社群圖片生成器</span>
+                </div>
+
+                {/* 截圖目標元素：維持固定寬度 420px、充足優雅內距 (28px)、無緊貼邊界 */}
+                <div className="flex justify-center p-2 bg-slate-100 rounded-2xl overflow-x-auto">
+                  <div
+                    ref={shareRef}
+                    style={{ width: '400px', margin: '0 auto', boxSizing: 'border-box' }}
+                    className="bg-white rounded-2xl shadow-xl border border-slate-200 p-7 text-slate-900 flex flex-col gap-5"
+                  >
+                    {/* 卡片頂部官方識別 */}
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-full bg-amber-800 text-white flex items-center justify-center font-serif font-bold text-base shadow">
+                          權
+                        </div>
+                        <div>
+                          <div className="font-bold text-xs text-slate-900 tracking-tight">國立清華大學學生會人權部</div>
+                          <div className="text-[10px] text-slate-400 font-mono">HUMAN RIGHTS ADVOCACY</div>
+                        </div>
+                      </div>
+                      <div className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-mono font-semibold">
+                        人權史上的一天
+                      </div>
+                    </div>
+
+                    {/* 卡片核心特質展示區 */}
+                    <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-5 text-center space-y-3">
+                      <div className="text-[11px] font-mono text-amber-800 tracking-widest uppercase">
+                        — 專屬公民性格判定 —
+                      </div>
+                      <h2 className="text-2xl font-black text-slate-900 tracking-wide font-serif">
+                        【{result}】
+                      </h2>
+                      <div className="flex flex-wrap gap-1 justify-center">
+                        {personalityTypes[result]?.traits.map((tr, i) => (
+                          <span key={i} className="text-[11px] bg-white text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200 shadow-2xs">
+                            #{tr}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-xs text-slate-700 leading-relaxed pt-1 max-w-xs mx-auto">
+                        {personalityTypes[result]?.description}
+                      </p>
+                    </div>
+
+                    {/* 配對之歷史時刻 */}
+                    <div className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-2">
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                        <span>歷史共鳴時刻</span>
+                        <span>{selectedEvent?.date}</span>
+                      </div>
+                      <h4 className="font-bold text-sm text-slate-900">{selectedEvent?.title}</h4>
+                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                        {selectedEvent?.description}
+                      </p>
+                    </div>
+
+                    {/* 卡片頁腳 */}
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                      <span>NTHU HUMAN RIGHTS PORTAL</span>
+                      <span>DECEMBER 10 · 人權日紀念</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 下載與分享按鈕 */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={downloadImage}
+                    className="flex-1 bg-amber-700 hover:bg-amber-800 text-white px-6 py-3.5 rounded-xl font-bold shadow flex items-center justify-center gap-2 transition-all"
+                  >
+                    <Download className="w-4 h-4" /> 下載高解析分享圖
+                  </button>
+                  <button
+                    onClick={shareImage}
+                    className="px-6 py-3.5 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-2 transition-all"
+                  >
+                    <Share2 className="w-4 h-4" /> 呼叫系統分享
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* =========================================================
+            分頁 4：練習紀錄與錯題本
+           ========================================================= */}
+        {activeTab === 'records' && (
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-center">
+                <div className="text-2xl font-bold text-slate-900 font-mono">{quizHistory.length}</div>
+                <div className="text-xs text-slate-500 mt-1">累計練習題數</div>
+              </div>
+              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-center">
+                <div className="text-2xl font-bold text-emerald-600 font-mono">
+                  {quizHistory.length > 0 
+                    ? Math.round((quizHistory.filter(h => h.isCorrect).length / quizHistory.length) * 100)
+                    : 0}%
+                </div>
+                <div className="text-xs text-slate-500 mt-1">整體正確率</div>
+              </div>
+              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm text-center col-span-2 sm:col-span-1">
+                <div className="text-2xl font-bold text-amber-700 font-mono">
+                  {quizHistory.filter(h => !h.isCorrect).length}
+                </div>
+                <div className="text-xs text-slate-500 mt-1">需複習錯題</div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                  <History className="w-4 h-4 text-amber-700" />
+                  答題紀錄明細
+                </h3>
+                {quizHistory.length > 0 && (
+                  <button
+                    onClick={() => {
+                      if (confirm('確定要清空本地練習紀錄嗎？')) {
+                        setQuizHistory([]);
+                        localStorage.removeItem('hr_quiz_history');
+                      }
+                    }}
+                    className="text-xs font-mono text-rose-600 hover:underline"
+                  >
+                    清空紀錄
+                  </button>
+                )}
+              </div>
+
+              {quizHistory.length === 0 ? (
+                <div className="text-center py-12 text-slate-400 text-sm">
+                  尚無練習紀錄。請至「常態題庫實戰」進行公約與法學題庫練習。
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {quizHistory.map(item => (
+                    <div key={item.id} className="p-3.5 rounded-xl border border-slate-100 bg-slate-50 flex items-start justify-between gap-3 text-xs">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-0.5 rounded font-mono font-semibold ${item.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
+                            {item.isCorrect ? '答對' : '答錯'}
+                          </span>
+                          <span className="text-slate-500 font-mono">{item.category}</span>
+                        </div>
+                        <p className="font-medium text-slate-800 text-sm">{item.question}</p>
+                      </div>
+                      <span className="text-slate-400 font-mono whitespace-nowrap">{item.date}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* 底部頁腳 */}
+      <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500 font-mono">
+        國立清華大學學生會人權部 · 憲政人權法學常態化智庫專案
+      </footer>
+    </div>
   );
 }
